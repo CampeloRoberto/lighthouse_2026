@@ -1,0 +1,27 @@
+# Ambiente Python
+.venv/
+__pycache__/
+*.pyc
+
+# Dados brutos (24 CSVs fornecidos pelo desafio — grandes e não gerados por nós;
+# mantenha localmente, não versionar). Remova estas duas linhas se preferir
+# versionar os CSVs junto com o código.
+data/raw/*.csv
+!data/raw/.gitkeep
+
+# Power BI
+dashboard/*.pbix.bak
+~$*.pbix
+
+# Scratch / arquivos temporários
+scratch_*.py
+scratch_*.txt
+*.tmp
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
