@@ -72,3 +72,6 @@ Se algum dado mudar (recarga do banco, ajuste em alguma query), rode o passo 6 d
 ## Decisões e premissas documentadas
 
 Sempre que uma questão deixava uma regra em aberto (ex.: filtrar `orders.status`, qual data usar como "data da venda", como tratar produtos com nome duplicado no catálogo), a escolha feita está documentada explicitamente em `respostas/respostas_desafio.md`.
+
+
+## Roberto Campelo Uchôa 2026
