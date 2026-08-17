@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LH Nautical — Dashboard do Desafio de Dados</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,500&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="#top">
+      <span class="brand-mark">⚓</span>
+      <span class="brand-text">
+        <span class="brand-name">LH Nautical</span>
+        <span class="brand-sub">Dashboard do Desafio de Dados</span>
+      </span>
+    </a>
+    <nav class="topnav">
+      <a href="#q1"><span class="nav-num">01</span>Diagnóstico</a>
+      <a href="#q4"><span class="nav-num">04</span>Clientes Fiéis</a>
+      <a href="#q5"><span class="nav-num">05</span>Vendas / Dia</a>
+      <a href="#q6"><span class="nav-num">06</span>Previsão</a>
+      <a href="#q7"><span class="nav-num">07</span>Recomendação</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <section class="intro">
+    <p class="eyebrow">Relatório de dados · edição 2026</p>
+    <h1>Da limpeza dos dados brutos à inteligência aplicada</h1>
+    <p class="intro-lead">
+      Este painel resume os principais achados do desafio de dados da LH Nautical: da EDA da tabela de pedidos,
+      passando pela modelagem do schema no PostgreSQL, até a previsão de demanda e o motor de recomendação.
+    </p>
+    <p class="intro-note">
+      Cada número aqui está documentado e explicado, com as premissas assumidas, no relatório completo do desafio.
+    </p>
+  </section>
+
+  <section id="q1" class="viz-root">
+    <div class="section-head">
+      <p class="plate">Fig. 01</p>
+      <h2>Diagnóstico da base</h2>
+      <span class="tag">tabela de pedidos, sem tratamento</span>
+      <p class="section-sub">Posso confiar nesses dados para tomar decisões? Uma leitura exploratória antes de qualquer limpeza.</p>
+    </div>
+
+    <div class="tiles" id="q1-tiles"></div>
+
+    <div class="chart-card">
+      <h3>Pedidos por status</h3>
+      <p class="chart-note">Só ~70% dos pedidos estão pagos — o resto está em rascunho, confirmado ou cancelado. É por isso que a base de pedidos sozinha não deve virar métrica de receita.</p>
+      <div class="chart-wrap"><canvas id="chart-q1-status"></canvas></div>
+    </div>
+
+    <div class="diagnosis-box">
+      <h3>Diagnóstico</h3>
+      <p>Os dados são utilizáveis, mas não estão prontos para virar métrica de negócio sem tratamento e relacionamento com outras tabelas. A distribuição do valor total é larga (cauda longa plausível — PF e PJ/frota convivem na mesma tabela), sem outlier isolado absurdo. Não há nulos em valor, status ou cliente, mas o vendedor está nulo em ~49% das linhas. Conclusão: confiável para leitura operacional, não para receita sem filtrar por status.</p>
+    </div>
+  </section>
+
+  <section id="q4" class="viz-root">
+    <div class="section-head">
+      <p class="plate">Fig. 04</p>
+      <h2>Clientes fiéis</h2>
+      <span class="tag">ticket médio × diversidade de categorias</span>
+      <p class="section-sub">Top 10 clientes por ticket médio, entre os que compraram de 13 ou mais das 14 categorias do catálogo.</p>
+    </div>
+
+    <div class="split">
+      <div class="chart-card grow">
+        <h3>Top 10 — ticket médio</h3>
+        <div class="chart-wrap tall"><canvas id="chart-q4-clientes"></canvas></div>
+      </div>
+      <div class="tile-stack" id="q4-tiles"></div>
+    </div>
+
+    <div class="table-card">
+      <h3>Detalhe dos 10 clientes</h3>
+      <div class="table-scroll"><table id="q4-table"></table></div>
+    </div>
+  </section>
+
+  <section id="q5" class="viz-root">
+    <div class="section-head">
+      <p class="plate">Fig. 05</p>
+      <h2>Vendas por dia da semana</h2>
+      <span class="tag">lojas físicas, calendário completo</span>
+      <p class="section-sub">Média incluindo os dias sem nenhuma venda registrada — não só os dias com pedido.</p>
+    </div>
+
+    <div class="chart-card">
+      <h3>Média de vendas (R$) por dia da semana</h3>
+      <p class="chart-note" id="q5-caption"></p>
+      <div class="chart-wrap"><canvas id="chart-q5-weekday"></canvas></div>
+    </div>
+  </section>
+
+  <section id="q6" class="viz-root">
+    <div class="section-head">
+      <p class="plate">Fig. 06</p>
+      <h2>Previsão de demanda</h2>
+      <span class="tag">Bússola de Bordo 702</span>
+      <p class="section-sub">Baseline de média móvel de 3 meses, walk-forward. Treino até dez/2025, teste = 1º trimestre de 2026.</p>
+    </div>
+
+    <div class="tiles" id="q6-tiles"></div>
+
+    <div class="chart-card">
+      <h3>Real vs. previsto (unidades / mês)</h3>
+      <div class="chart-wrap"><canvas id="chart-q6-forecast"></canvas></div>
+    </div>
+  </section>
+
+  <section id="q7" class="viz-root">
+    <div class="section-head">
+      <p class="plate">Fig. 07</p>
+      <h2>Recomendação</h2>
+      <span class="tag">similaridade de cosseno</span>
+      <p class="section-sub">Top 5 produtos mais similares a "Motor de Popa 1949", com base em quais clientes compraram cada item.</p>
+    </div>
+
+    <div class="chart-card">
+      <h3>Similaridade de cosseno</h3>
+      <div class="chart-wrap"><canvas id="chart-q7-similares"></canvas></div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer"></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

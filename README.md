@@ -11,7 +11,8 @@ data/raw/              os 24 CSVs originais (imutáveis)
 sql/                   SQL de cada questão (Q1, Q4, Q5) + schema gerado (Q2)
 src/                   scripts Python de cada questão (Q2, Q3, Q6, Q7) + helper db.py
 respostas/             respostas_desafio.md — validações e explicações de cada questão
-dashboard/             lh_nautical.pbix (a montar) + guia de montagem
+docs/                  dashboard web (HTML/CSS/JS + Chart.js), publicado via GitHub Pages
+dashboard/             guia de referência do Power BI (caminho secundário, não usado na entrega final)
 .venv/                 ambiente virtual Python do projeto
 ```
 
@@ -22,7 +23,7 @@ dashboard/             lh_nautical.pbix (a montar) + guia de montagem
 - O script da Questão 2 (`src/q2_generate_schema.py`) roda com **qualquer** Python 3 (só biblioteca padrão) — não depende do venv.
 - O script da Questão 7 (`src/q7_recommend_similar.py`) usa só `pandas`/`numpy`/`sklearn`, lendo os CSVs diretamente (não usa Postgres), conforme a lista de bibliotecas permitida na questão.
 
-## Como reproduzir, do zero
+## Preparação do Ambiente
 
 ```powershell
 # 1. Gerar o schema (Q2) — funciona com qualquer Python 3, sem instalar nada
@@ -42,14 +43,33 @@ $env:PGPASSWORD="123456"
 
 # 5. Exportar os resultados de Q6/Q7 como tabelas no Postgres, para o dashboard
 .venv\Scripts\python.exe src\export_results_for_dashboard.py
+
+# 6. Exportar os JSON estáticos que alimentam o dashboard web
+.venv\Scripts\python.exe src\export_dashboard_json.py
 ```
 
 A Questão 1 (`sql/q1_eda_orders.sql`) roda com DuckDB direto sobre `orders.csv`, sem precisar do Postgres — é anterior à criação do banco no fluxo do desafio.
 
 ## Dashboard
 
-Ver [`dashboard/COMO_MONTAR_DASHBOARD.md`](dashboard/COMO_MONTAR_DASHBOARD.md) — guia passo a passo para conectar o Power BI Desktop (já instalado) ao Postgres e montar as páginas do painel a partir das views/tabelas já prontas (`v_q4_clientes_fieis`, `v_q5_calendario_vendas`, `q6_previsao_demanda`, `q7_recomendacoes`).
+O dashboard é uma página web estática em [`docs/`](docs/) (HTML/CSS/JS puro + Chart.js via CDN, sem build step), publicada com **GitHub Pages**. Os dados vêm de JSON pré-exportados em `docs/data/` (gerados pelo passo 6 acima) — a página não depende de nenhum servidor/banco rodando ao vivo.
+
+**Testar localmente:**
+```powershell
+cd docs
+python -m http.server 8080
+# abrir http://localhost:8080 no navegador
+```
+
+**Publicar no GitHub Pages** (depois de dar `git push` do repositório):
+1. No GitHub, vá em `Settings → Pages`.
+2. Em "Build and deployment", escolha **"Deploy from a branch"**.
+3. Branch: `main` — Pasta: **`/docs`**.
+4. Salvar. Em alguns minutos o link fica disponível em `https://<seu-usuário>.github.io/<repo>/`.
+
+Se algum dado mudar (recarga do banco, ajuste em alguma query), rode o passo 6 de novo e faça commit dos JSON atualizados em `docs/data/` — o GitHub Pages redesenha automaticamente no próximo push.
+
 
 ## Decisões e premissas documentadas
 
-Sempre que uma questão deixava uma regra em aberto (ex.: filtrar `orders.status`, qual data usar como "data da venda", como tratar produtos com nome duplicado no catálogo), a escolha feita está documentada explicitamente em `respostas/respostas_desafio.md`, seção da questão correspondente — nenhuma decisão de negócio foi tomada "escondida" dentro do código.
+Sempre que uma questão deixava uma regra em aberto (ex.: filtrar `orders.status`, qual data usar como "data da venda", como tratar produtos com nome duplicado no catálogo), a escolha feita está documentada explicitamente em `respostas/respostas_desafio.md`.

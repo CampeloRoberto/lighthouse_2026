@@ -1,0 +1,32 @@
+[
+  {
+    "produto_referencia_nome": "Motor de Popa 1949",
+    "produto_recomendado_nome": "Motor de Popa 5331",
+    "similaridade": 0.2565525786018399,
+    "rank": 1
+  },
+  {
+    "produto_referencia_nome": "Motor de Popa 1949",
+    "produto_recomendado_nome": "Cabo Náutico 2105",
+    "similaridade": 0.25623872619465937,
+    "rank": 2
+  },
+  {
+    "produto_referencia_nome": "Motor de Popa 1949",
+    "produto_recomendado_nome": "Vela Mestra 1913",
+    "similaridade": 0.2557845932048532,
+    "rank": 3
+  },
+  {
+    "produto_referencia_nome": "Motor de Popa 1949",
+    "produto_recomendado_nome": "Cabo Náutico 9048",
+    "similaridade": 0.23933229542856416,
+    "rank": 4
+  },
+  {
+    "produto_referencia_nome": "Motor de Popa 1949",
+    "produto_recomendado_nome": "GPS Plotter 6249",
+    "similaridade": 0.23774365646117246,
+    "rank": 5
+  }
+]

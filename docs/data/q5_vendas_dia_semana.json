@@ -1,0 +1,51 @@
+[
+  {
+    "dow": 1,
+    "dia_semana": "Segunda-feira",
+    "qtd_dias_no_calendario": 365,
+    "soma_vendas": 57758021.43,
+    "media_vendas": 158241.15460273973
+  },
+  {
+    "dow": 2,
+    "dia_semana": "Terça-feira",
+    "qtd_dias_no_calendario": 365,
+    "soma_vendas": 60633373.26,
+    "media_vendas": 166118.83084931507
+  },
+  {
+    "dow": 3,
+    "dia_semana": "Quarta-feira",
+    "qtd_dias_no_calendario": 366,
+    "soma_vendas": 63539589.22,
+    "media_vendas": 173605.4350273224
+  },
+  {
+    "dow": 4,
+    "dia_semana": "Quinta-feira",
+    "qtd_dias_no_calendario": 366,
+    "soma_vendas": 57518480.61,
+    "media_vendas": 157154.31860655738
+  },
+  {
+    "dow": 5,
+    "dia_semana": "Sexta-feira",
+    "qtd_dias_no_calendario": 365,
+    "soma_vendas": 62120694.25,
+    "media_vendas": 170193.68287671232
+  },
+  {
+    "dow": 6,
+    "dia_semana": "Sábado",
+    "qtd_dias_no_calendario": 365,
+    "soma_vendas": 60173268.58,
+    "media_vendas": 164858.27008219177
+  },
+  {
+    "dow": 7,
+    "dia_semana": "Domingo",
+    "qtd_dias_no_calendario": 365,
+    "soma_vendas": 57529887.95,
+    "media_vendas": 157616.13136986303
+  }
+]

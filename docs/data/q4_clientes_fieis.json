@@ -1,0 +1,79 @@
+{
+  "clientes": [
+    {
+      "customer_id": 22,
+      "frequencia": 26,
+      "faturamento_total": 1087838.44,
+      "ticket_medio": 41839.94,
+      "diversidade_categorias": 14
+    },
+    {
+      "customer_id": 1477,
+      "frequencia": 22,
+      "faturamento_total": 916262.58,
+      "ticket_medio": 41648.29909090909,
+      "diversidade_categorias": 14
+    },
+    {
+      "customer_id": 929,
+      "frequencia": 26,
+      "faturamento_total": 1082775.89,
+      "ticket_medio": 41645.22653846154,
+      "diversidade_categorias": 14
+    },
+    {
+      "customer_id": 1116,
+      "frequencia": 16,
+      "faturamento_total": 655737.2,
+      "ticket_medio": 40983.575,
+      "diversidade_categorias": 14
+    },
+    {
+      "customer_id": 1691,
+      "frequencia": 20,
+      "faturamento_total": 815471.3,
+      "ticket_medio": 40773.565,
+      "diversidade_categorias": 14
+    },
+    {
+      "customer_id": 774,
+      "frequencia": 18,
+      "faturamento_total": 726127.99,
+      "ticket_medio": 40340.44388888889,
+      "diversidade_categorias": 14
+    },
+    {
+      "customer_id": 1470,
+      "frequencia": 26,
+      "faturamento_total": 1040553.09,
+      "ticket_medio": 40021.27269230769,
+      "diversidade_categorias": 14
+    },
+    {
+      "customer_id": 1599,
+      "frequencia": 25,
+      "faturamento_total": 997616.46,
+      "ticket_medio": 39904.6584,
+      "diversidade_categorias": 14
+    },
+    {
+      "customer_id": 965,
+      "frequencia": 17,
+      "faturamento_total": 677297.78,
+      "ticket_medio": 39841.04588235294,
+      "diversidade_categorias": 14
+    },
+    {
+      "customer_id": 1722,
+      "frequencia": 29,
+      "faturamento_total": 1146455.22,
+      "ticket_medio": 39532.93862068965,
+      "diversidade_categorias": 14
+    }
+  ],
+  "categoria_top": {
+    "category_id": 8,
+    "category_name": "Hélices",
+    "quantidade_total": 492.0
+  }
+}

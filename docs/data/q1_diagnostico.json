@@ -1,0 +1,27 @@
+{
+  "total_pedidos": 48998,
+  "total_colunas": 13,
+  "data_min": "2020-01-01T01:19:28",
+  "data_max": "2026-12-31T23:43:09",
+  "total_min": 32.62,
+  "total_max": 127262.02,
+  "total_medio": 28704.992077227642,
+  "status_breakdown": [
+    {
+      "status": "paid",
+      "quantidade": 34365
+    },
+    {
+      "status": "confirmed",
+      "quantidade": 7335
+    },
+    {
+      "status": "cancelled",
+      "quantidade": 4847
+    },
+    {
+      "status": "draft",
+      "quantidade": 2451
+    }
+  ]
+}
