@@ -11,6 +11,8 @@
 </head>
 <body>
 
+<div id="scroll-progress"></div>
+
 <header class="topbar">
   <div class="topbar-inner">
     <a class="brand" href="#top">
@@ -26,6 +28,7 @@
       <a href="#q5"><span class="nav-num">05</span>Vendas / Dia</a>
       <a href="#q6"><span class="nav-num">06</span>Previsão</a>
       <a href="#q7"><span class="nav-num">07</span>Recomendação</a>
+      <span class="nav-indicator"></span>
     </nav>
   </div>
 </header>
@@ -34,32 +37,31 @@
 
   <section class="intro">
     <p class="eyebrow">Relatório de dados · Roberto Campelo 2026</p>
-    <h1>Da limpeza dos dados brutos à inteligência aplicada</h1>
+    <h1>DashBoard LH Nautical</h1>
     <p class="intro-lead">
       Este painel resume os principais achados do desafio de dados da LH Nautical: da EDA da tabela de pedidos,
       passando pela modelagem do schema no PostgreSQL, até a previsão de demanda e o motor de recomendação.
     </p>
     <p class="intro-note">
-      Cada número aqui está documentado e explicado, com as premissas assumidas, no relatório completo do desafio.
+      Cada número aqui está documentado e explicado, com as premissas assumidas, no relatório completo do desafio, na pasta respostas.
     </p>
   </section>
 
   <section id="q1" class="viz-root">
     <div class="section-head">
-      <p class="plate">Fig. 01</p>
       <h2>Diagnóstico da base</h2>
       <p class="section-sub">Posso confiar nesses dados para tomar decisões? Uma leitura exploratória antes de qualquer limpeza.</p>
     </div>
 
     <div class="tiles" id="q1-tiles"></div>
 
-    <div class="chart-card">
+    <div class="chart-card reveal">
       <h3>Pedidos por status</h3>
       <p class="chart-note">Só ~70% dos pedidos estão pagos — o resto está em rascunho, confirmado ou cancelado. É por isso que a base de pedidos sozinha não deve virar métrica de receita.</p>
       <div class="chart-wrap"><canvas id="chart-q1-status"></canvas></div>
     </div>
 
-    <div class="diagnosis-box">
+    <div class="diagnosis-box reveal">
       <h3>Diagnóstico</h3>
       <p>Os dados são utilizáveis, mas não estão prontos para virar métrica de negócio sem tratamento e relacionamento com outras tabelas. A distribuição do valor total é larga (cauda longa plausível — PF e PJ/frota convivem na mesma tabela), sem outlier isolado absurdo. Não há nulos em valor, status ou cliente, mas o vendedor está nulo em ~49% das linhas. Conclusão: confiável para leitura operacional, não para receita sem filtrar por status.</p>
     </div>
@@ -67,20 +69,19 @@
 
   <section id="q4" class="viz-root">
     <div class="section-head">
-      <p class="plate">Fig. 04</p>
       <h2>Clientes fiéis</h2>
       <p class="section-sub">Top 10 clientes por ticket médio, entre os que compraram de 13 ou mais das 14 categorias do catálogo.</p>
     </div>
 
     <div class="split">
-      <div class="chart-card grow">
+      <div class="chart-card grow reveal">
         <h3>Top 10 — ticket médio</h3>
         <div class="chart-wrap tall"><canvas id="chart-q4-clientes"></canvas></div>
       </div>
       <div class="tile-stack" id="q4-tiles"></div>
     </div>
 
-    <div class="table-card">
+    <div class="table-card reveal">
       <h3>Detalhe dos 10 clientes</h3>
       <div class="table-scroll"><table id="q4-table"></table></div>
     </div>
@@ -88,12 +89,11 @@
 
   <section id="q5" class="viz-root">
     <div class="section-head">
-      <p class="plate">Fig. 05</p>
       <h2>Vendas por dia da semana</h2>
       <p class="section-sub">Média incluindo os dias sem nenhuma venda registrada — não só os dias com pedido.</p>
     </div>
 
-    <div class="chart-card">
+    <div class="chart-card reveal">
       <h3>Média de vendas (R$) por dia da semana</h3>
       <p class="chart-note" id="q5-caption"></p>
       <div class="chart-wrap"><canvas id="chart-q5-weekday"></canvas></div>
@@ -102,14 +102,13 @@
 
   <section id="q6" class="viz-root">
     <div class="section-head">
-      <p class="plate">Fig. 06</p>
       <h2>Previsão de demanda</h2>
       <p class="section-sub">Baseline de média móvel de 3 meses, walk-forward. Treino até dez/2025, teste = 1º trimestre de 2026.</p>
     </div>
 
     <div class="tiles" id="q6-tiles"></div>
 
-    <div class="chart-card">
+    <div class="chart-card reveal">
       <h3>Real vs. previsto (unidades / mês)</h3>
       <div class="chart-wrap"><canvas id="chart-q6-forecast"></canvas></div>
     </div>
@@ -117,12 +116,11 @@
 
   <section id="q7" class="viz-root">
     <div class="section-head">
-      <p class="plate">Fig. 07</p>
       <h2>Recomendação</h2>
       <p class="section-sub">Top 5 produtos mais similares a "Motor de Popa 1949", com base em quais clientes compraram cada item.</p>
     </div>
 
-    <div class="chart-card">
+    <div class="chart-card reveal">
       <h3>Similaridade de cosseno</h3>
       <div class="chart-wrap"><canvas id="chart-q7-similares"></canvas></div>
     </div>

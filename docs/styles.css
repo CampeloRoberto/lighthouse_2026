@@ -52,7 +52,6 @@ html, body {
   background: var(--page);
   color: var(--text-primary);
   font-family: var(--font-body);
-  overflow-x: hidden;
 }
 
 code {
@@ -294,4 +293,87 @@ th {
   font-size: 0.82rem;
   max-width: 1140px;
   margin: 0 auto;
+}
+
+/* ---------- scroll progress bar ---------- */
+#scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--series-1), var(--series-2));
+  z-index: 20;
+  transition: width 0.1s linear;
+}
+
+/* ---------- nav active indicator ---------- */
+.topnav { position: relative; }
+.topnav a.active { color: var(--text-primary); }
+.nav-indicator {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  width: 0;
+  background: var(--series-1);
+  border-radius: 2px;
+  transition: transform 0.35s cubic-bezier(0.65, 0, 0.35, 1), width 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+  opacity: 0;
+}
+.nav-indicator.is-active { opacity: 1; }
+
+/* ---------- scroll reveal ---------- */
+.js-ready .reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.js-ready .reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* stagger for tile grids */
+.tiles .reveal.is-visible, .tile-stack .reveal.is-visible { transition-delay: calc(var(--stagger, 0) * 70ms); }
+
+/* ---------- hover lift ---------- */
+.chart-card, .table-card, .tile {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.chart-card:hover, .table-card:hover, .tile:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px oklch(0% 0 0 / 0.08);
+  border-color: color-mix(in oklch, var(--series-1) 35%, var(--border));
+}
+
+/* ---------- count-up numerals ---------- */
+.tile-value { font-variant-numeric: tabular-nums; }
+
+/* ---------- anchor sway ---------- */
+.js-ready .brand-mark {
+  animation: anchor-sway 6s ease-in-out infinite;
+  transform-origin: 50% 15%;
+}
+@keyframes anchor-sway {
+  0%, 100% { transform: rotate(-3deg); }
+  50%      { transform: rotate(3deg); }
+}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .js-ready .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .js-ready .brand-mark {
+    animation: none !important;
+  }
+  .chart-card, .table-card, .tile {
+    transition: none !important;
+  }
+  #scroll-progress, .nav-indicator {
+    transition: none !important;
+  }
 }

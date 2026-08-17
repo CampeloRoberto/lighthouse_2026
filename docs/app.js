@@ -1,6 +1,10 @@
 /* Dashboard do Desafio LH Nautical — le os JSON estaticos em data/ e desenha
    os graficos com Chart.js. Nao depende de nenhum backend. */
 
+document.documentElement.classList.add("js-ready");
+
+const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
 const COLOR = {
@@ -18,6 +22,7 @@ const COLOR = {
 Chart.defaults.font.family = "'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif";
 Chart.defaults.color = COLOR.text;
 Chart.defaults.borderColor = COLOR.grid;
+if (prefersReducedMotion) Chart.defaults.animation = false;
 if (window.ChartDataLabels) Chart.register(ChartDataLabels);
 
 const tooltipBase = {
@@ -34,7 +39,8 @@ const tooltipBase = {
 
 const fmtBRL = (v) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(v);
 const fmtBRLFull = (v) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
-const fmtNum = (v) => new Intl.NumberFormat("pt-BR").format(v);
+const fmtNum = (v) => new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 0 }).format(v);
+const fmtDec2 = (v) => v.toFixed(2);
 const fmtDate = (iso) => {
   const d = new Date(iso);
   return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
@@ -44,8 +50,12 @@ const fmtMonth = (iso) => {
   return d.toLocaleDateString("pt-BR", { month: "short", year: "2-digit" }).replace(".", "");
 };
 
-function tile(label, value, small) {
-  return `<div class="tile"><div class="tile-label">${label}</div><div class="tile-value${small ? " small" : ""}">${value}</div></div>`;
+const FORMATTERS = { int: fmtNum, brl: fmtBRLFull, brl0: fmtBRL, dec2: fmtDec2 };
+
+/* raw != null => vira contagem animada (count-up) quando a section entra na tela */
+function tile(label, text, { small, raw, fmt } = {}) {
+  const attrs = raw !== undefined ? ` data-raw="${raw}" data-fmt="${fmt || "int"}"` : "";
+  return `<div class="tile reveal"><div class="tile-label">${label}</div><div class="tile-value${small ? " small" : ""}"${attrs}>${text}</div></div>`;
 }
 
 async function loadJSON(path) {
@@ -74,20 +84,51 @@ function hGradient(ctx, chartArea, colorHex) {
   return gradient;
 }
 
-/* ---------------- Q1 — Diagnóstico ---------------- */
-async function renderQ1() {
-  const data = await loadJSON("data/q1_diagnostico.json");
+/* ---------------- animação: contagem numérica ---------------- */
+function animateCount(el, target, formatter, duration = 900) {
+  if (prefersReducedMotion || !isFinite(target)) {
+    el.textContent = formatter(target);
+    return;
+  }
+  const start = performance.now();
+  function tick(now) {
+    const p = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
+    el.textContent = formatter(target * eased);
+    if (p < 1) requestAnimationFrame(tick);
+    else el.textContent = formatter(target);
+  }
+  requestAnimationFrame(tick);
+}
 
+function activateCountUps(root) {
+  root.querySelectorAll(".tile-value[data-raw]").forEach((el) => {
+    const target = parseFloat(el.dataset.raw);
+    animateCount(el, target, FORMATTERS[el.dataset.fmt] || fmtNum);
+  });
+}
+
+/* ---------------- animação: revelar ao rolar (com stagger) ---------------- */
+function revealWithin(root) {
+  const items = root.querySelectorAll(".reveal");
+  items.forEach((el, i) => {
+    el.style.transitionDelay = prefersReducedMotion ? "0ms" : `${Math.min(i, 8) * 70}ms`;
+    el.classList.add("is-visible");
+  });
+}
+
+/* ================= Q1 — Diagnóstico ================= */
+function mountQ1(data) {
   document.getElementById("q1-tiles").innerHTML = [
-    tile("Total de pedidos", fmtNum(data.total_pedidos)),
+    tile("Total de pedidos", fmtNum(data.total_pedidos), { raw: data.total_pedidos, fmt: "int" }),
     tile("Colunas", data.total_colunas),
-    tile("Data mínima", fmtDate(data.data_min), true),
-    tile("Data máxima", fmtDate(data.data_max), true),
-    tile("Total médio", fmtBRL(data.total_medio)),
-    tile("Total mín. / máx.", fmtBRL(data.total_min) + " – " + fmtBRL(data.total_max), true),
+    tile("Data mínima", fmtDate(data.data_min), { small: true }),
+    tile("Data máxima", fmtDate(data.data_max), { small: true }),
+    tile("Total médio", fmtBRL(data.total_medio), { raw: data.total_medio, fmt: "brl0" }),
+    tile("Total mín. / máx.", fmtBRL(data.total_min) + " – " + fmtBRL(data.total_max), { small: true }),
   ].join("");
 
-  new Chart(document.getElementById("chart-q1-status"), {
+  return new Chart(document.getElementById("chart-q1-status"), {
     type: "bar",
     data: {
       labels: data.status_breakdown.map((d) => d.status),
@@ -120,18 +161,17 @@ async function renderQ1() {
   });
 }
 
-/* ---------------- Q4 — Clientes fiéis ---------------- */
-async function renderQ4() {
-  const data = await loadJSON("data/q4_clientes_fieis.json");
+/* ================= Q4 — Clientes fiéis ================= */
+function mountQ4(data) {
   const clientes = data.clientes;
 
   document.getElementById("q4-tiles").innerHTML = [
     tile("Categoria líder (top 10)", data.categoria_top.category_name),
-    tile("Unidades dessa categoria", fmtNum(data.categoria_top.quantidade_total), true),
-    tile("Cliente #1 em ticket médio", "Cliente " + clientes[0].customer_id, true),
+    tile("Unidades dessa categoria", fmtNum(data.categoria_top.quantidade_total), { small: true, raw: data.categoria_top.quantidade_total, fmt: "int" }),
+    tile("Cliente #1 em ticket médio", "Cliente " + clientes[0].customer_id, { small: true }),
   ].join("");
 
-  new Chart(document.getElementById("chart-q4-clientes"), {
+  const chart = new Chart(document.getElementById("chart-q4-clientes"), {
     type: "bar",
     data: {
       labels: clientes.map((c) => "Cliente " + c.customer_id),
@@ -171,18 +211,18 @@ async function renderQ4() {
   document.getElementById("q4-table").innerHTML = `
     <thead><tr><th>Cliente</th><th>Frequência</th><th>Faturamento</th><th>Ticket médio</th><th>Categorias</th></tr></thead>
     <tbody>${rows}</tbody>`;
+
+  return chart;
 }
 
-/* ---------------- Q5 — Vendas por dia da semana ---------------- */
-async function renderQ5() {
-  const data = await loadJSON("data/q5_vendas_dia_semana.json");
-
+/* ================= Q5 — Vendas por dia da semana ================= */
+function mountQ5(data) {
   const worst = data.reduce((a, b) => (a.media_vendas < b.media_vendas ? a : b));
   const best = data.reduce((a, b) => (a.media_vendas > b.media_vendas ? a : b));
   document.getElementById("q5-caption").innerHTML =
     `Pior dia: <strong>${worst.dia_semana}</strong> (${fmtBRLFull(worst.media_vendas)}) — melhor dia: <strong>${best.dia_semana}</strong> (${fmtBRLFull(best.media_vendas)}). Média calculada sobre os ${worst.qtd_dias_no_calendario} dias do calendário, incluindo os sem venda.`;
 
-  new Chart(document.getElementById("chart-q5-weekday"), {
+  return new Chart(document.getElementById("chart-q5-weekday"), {
     type: "bar",
     data: {
       labels: data.map((d) => d.dia_semana.replace("-feira", "")),
@@ -215,23 +255,21 @@ async function renderQ5() {
   });
 }
 
-/* ---------------- Q6 — Previsão de demanda ---------------- */
-async function renderQ6() {
-  const all = await loadJSON("data/q6_previsao_demanda.json");
+/* ================= Q6 — Previsão de demanda ================= */
+function mountQ6(all) {
   const recent = all.filter((d) => d.mes >= "2025-01-01");
-
   const testSet = all.filter((d) => d.conjunto === "teste");
   const mae = testSet.reduce((sum, d) => sum + Math.abs(d.quantidade_real - d.quantidade_prevista), 0) / testSet.length;
   const totalPrevisto = Math.round(testSet.reduce((s, d) => s + d.quantidade_prevista, 0));
   const totalReal = testSet.reduce((s, d) => s + d.quantidade_real, 0);
 
   document.getElementById("q6-tiles").innerHTML = [
-    tile("MAE (jan–mar/2026)", mae.toFixed(2)),
-    tile("Previsto no trimestre", fmtNum(totalPrevisto) + " un."),
-    tile("Real no trimestre", fmtNum(totalReal) + " un."),
+    tile("MAE (jan–mar/2026)", fmtDec2(mae), { raw: mae, fmt: "dec2" }),
+    tile("Previsto no trimestre", fmtNum(totalPrevisto) + " un.", { raw: totalPrevisto, fmt: "int" }),
+    tile("Real no trimestre", fmtNum(totalReal) + " un.", { raw: totalReal, fmt: "int" }),
   ].join("");
 
-  new Chart(document.getElementById("chart-q6-forecast"), {
+  return new Chart(document.getElementById("chart-q6-forecast"), {
     type: "line",
     data: {
       labels: recent.map((d) => fmtMonth(d.mes)),
@@ -282,11 +320,9 @@ async function renderQ6() {
   });
 }
 
-/* ---------------- Q7 — Recomendação ---------------- */
-async function renderQ7() {
-  const data = await loadJSON("data/q7_recomendacoes.json");
-
-  new Chart(document.getElementById("chart-q7-similares"), {
+/* ================= Q7 — Recomendação ================= */
+function mountQ7(data) {
+  return new Chart(document.getElementById("chart-q7-similares"), {
     type: "bar",
     data: {
       labels: data.map((d) => d.produto_recomendado_nome),
@@ -316,13 +352,126 @@ async function renderQ7() {
   });
 }
 
-Promise.all([renderQ1(), renderQ4(), renderQ5(), renderQ6(), renderQ7()]).catch((err) => {
-  console.error(err);
-  document.querySelector("main").insertAdjacentHTML(
-    "afterbegin",
-    `<p style="color:#e34948;padding:12px 16px;border:1px solid currentColor;border-radius:8px;">
-       Erro ao carregar os dados do dashboard: ${err.message}. Confira se os arquivos em <code>data/</code> existem
-       e se a página está sendo servida por um servidor (não aberta como <code>file://</code>).
-     </p>`
-  );
+/* ================= orquestração: fetch eager, montagem lazy ================= */
+const MOUNTERS = { q1: mountQ1, q4: mountQ4, q5: mountQ5, q6: mountQ6, q7: mountQ7 };
+const FILES = {
+  q1: "data/q1_diagnostico.json",
+  q4: "data/q4_clientes_fieis.json",
+  q5: "data/q5_vendas_dia_semana.json",
+  q6: "data/q6_previsao_demanda.json",
+  q7: "data/q7_recomendacoes.json",
+};
+
+const dataPromises = Object.fromEntries(
+  Object.entries(FILES).map(([id, path]) => [id, loadJSON(path)])
+);
+
+const chartsBySection = {};
+const mountedSections = new Set();
+
+function hideWithin(root) {
+  root.querySelectorAll(".reveal").forEach((el) => el.classList.remove("is-visible"));
+}
+
+/* monta os dados (tiles + Chart) uma única vez por seção */
+async function mountSection(section) {
+  const id = section.id;
+  try {
+    const data = await dataPromises[id];
+    const chart = MOUNTERS[id](data);
+    if (chart) chartsBySection[id] = chart;
+  } catch (err) {
+    console.error(err);
+    section.insertAdjacentHTML(
+      "beforeend",
+      `<p style="color:#e34948;padding:12px 16px;border:1px solid currentColor;border-radius:8px;">
+         Erro ao carregar os dados desta seção: ${err.message}. Confira se a página está sendo servida por um
+         servidor (não aberta como <code>file://</code>).
+       </p>`
+    );
+  }
+  mountedSections.add(id);
+}
+
+/* toca a animação (fade/slide, contagem, gráfico) — roda toda vez que a seção entra na tela */
+function playSection(section) {
+  revealWithin(section);
+  activateCountUps(section);
+  const chart = chartsBySection[section.id];
+  if (chart) chart.update();
+}
+
+/* deixa tudo pronto pra reanimar da próxima vez que a seção voltar a aparecer */
+function pauseSection(section) {
+  hideWithin(section);
+  const chart = chartsBySection[section.id];
+  if (chart) chart.reset();
+}
+
+const sectionObserver = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(async (entry) => {
+      const section = entry.target;
+      if (entry.isIntersecting) {
+        if (!mountedSections.has(section.id)) await mountSection(section);
+        playSection(section);
+      } else if (mountedSections.has(section.id)) {
+        pauseSection(section);
+      }
+    });
+  },
+  { threshold: 0.15, rootMargin: "0px 0px -10% 0px" }
+);
+document.querySelectorAll("section.viz-root").forEach((s) => sectionObserver.observe(s));
+
+/* ---------------- barra de progresso de leitura ---------------- */
+const progressBar = document.getElementById("scroll-progress");
+let progressTicking = false;
+function updateProgress() {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+  progressBar.style.width = pct + "%";
+  progressTicking = false;
+}
+window.addEventListener("scroll", () => {
+  if (!progressTicking) {
+    requestAnimationFrame(updateProgress);
+    progressTicking = true;
+  }
+}, { passive: true });
+updateProgress();
+
+/* ---------------- navegação com indicador ativo (scrollspy) ---------------- */
+const navLinks = Array.from(document.querySelectorAll(".topnav a"));
+const navIndicator = document.querySelector(".nav-indicator");
+
+function moveIndicatorTo(link) {
+  if (!link) { navIndicator.classList.remove("is-active"); return; }
+  const nav = link.parentElement.getBoundingClientRect();
+  const rect = link.getBoundingClientRect();
+  navIndicator.style.width = rect.width + "px";
+  navIndicator.style.transform = `translateX(${rect.left - nav.left}px)`;
+  navIndicator.classList.add("is-active");
+}
+
+const navObserver = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      const link = navLinks.find((a) => a.getAttribute("href") === "#" + entry.target.id);
+      navLinks.forEach((a) => a.classList.remove("active"));
+      if (link) {
+        link.classList.add("active");
+        moveIndicatorTo(link);
+      }
+    });
+  },
+  { rootMargin: "-40% 0px -55% 0px", threshold: 0 }
+);
+document.querySelectorAll("section.viz-root").forEach((s) => navObserver.observe(s));
+
+window.addEventListener("resize", () => {
+  const active = document.querySelector(".topnav a.active");
+  if (active) moveIndicatorTo(active);
 });
