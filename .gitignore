@@ -12,6 +12,9 @@ data/raw/*.csv
 # Dashboard antigo do Power BI (abandonado — o dashboard final é docs/, via GitHub Pages)
 dashboard/
 
+# Respostas do desafio
+respostas/
+
 # Scratch / arquivos temporários
 scratch_*.py
 scratch_*.txt
