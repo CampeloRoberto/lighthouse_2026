@@ -39,9 +39,31 @@
     <p class="eyebrow">Relatório de dados · Roberto Campelo 2026</p>
     <h1>DashBoard LH Nautical</h1>
     <p class="intro-lead">
-      Este painel resume os principais achados do desafio de dados da LH Nautical: da EDA da tabela de pedidos,
-      passando pela modelagem do schema no PostgreSQL, até a previsão de demanda e o motor de recomendação.
+      A campanha da LH Nautical lança <strong>semana que vem</strong> e os dados brutos chegaram desorganizados.
+      Este painel é a resposta ao briefing de Gabriel Santos: limpar as bases, estruturar o schema e transformar
+      isso em decisões em que a diretoria confie antes do lançamento.
     </p>
+    <blockquote class="gabriel-quote">
+      "Eu valorizo mais a organização e a explicação do que o código rodando sem eu entender nada."
+      <cite>— Gabriel Santos, Tech Lead</cite>
+    </blockquote>
+    <div class="persona-row">
+      <div class="persona-chip">
+        <span class="persona-name">Gabriel Santos</span>
+        <span class="persona-role">Tech Lead</span>
+        <span class="persona-line">Quer organização e raciocínio explicado, não só código rodando.</span>
+      </div>
+      <div class="persona-chip">
+        <span class="persona-name">Marina Costa</span>
+        <span class="persona-role">Gerente de Negócios</span>
+        <span class="persona-line">Quer performance de vendas e replicar o comportamento dos melhores clientes.</span>
+      </div>
+      <div class="persona-chip">
+        <span class="persona-name">Sr. Almir</span>
+        <span class="persona-role">Fundador</span>
+        <span class="persona-line">Desconfia de tudo que não seja prova concreta nos números.</span>
+      </div>
+    </div>
     <p class="intro-note">
       Cada número aqui está documentado e explicado, com as premissas assumidas, no relatório completo do desafio, na pasta respostas.
     </p>
@@ -50,7 +72,8 @@
   <section id="q1" class="viz-root">
     <div class="section-head">
       <h2>Diagnóstico da base</h2>
-      <p class="section-sub">Posso confiar nesses dados para tomar decisões? Uma leitura exploratória antes de qualquer limpeza.</p>
+      <p class="section-sub">Antes de qualquer decisão de campanha, a base de pedidos precisa passar no teste de confiança.</p>
+      <p class="scenario-quote reveal">"Posso confiar nesses dados para tomar decisões?" <cite>— Sr. Almir</cite></p>
     </div>
 
     <div class="tiles" id="q1-tiles"></div>
@@ -63,7 +86,7 @@
 
     <div class="diagnosis-box reveal">
       <h3>Diagnóstico</h3>
-      <p>Os dados são utilizáveis, mas não estão prontos para virar métrica de negócio sem tratamento e relacionamento com outras tabelas. A distribuição do valor total é larga (cauda longa plausível — PF e PJ/frota convivem na mesma tabela), sem outlier isolado absurdo. Não há nulos em valor, status ou cliente, mas o vendedor está nulo em ~49% das linhas. Conclusão: confiável para leitura operacional, não para receita sem filtrar por status.</p>
+      <p>Os dados são utilizáveis, mas não estão prontos para virar métrica de negócio sem tratamento e relacionamento com outras tabelas. A distribuição do valor total é larga (cauda longa plausível — PF e PJ/frota convivem na mesma tabela), sem outlier isolado absurdo. Não há nulos em valor, status ou cliente, mas o vendedor está nulo em ~49% das linhas. Conclusão: confiável para leitura operacional, não para receita sem filtrar por status — a base das próximas seções, todas construídas em cima desse cuidado.</p>
     </div>
   </section>
 
@@ -71,6 +94,7 @@
     <div class="section-head">
       <h2>Clientes fiéis</h2>
       <p class="section-sub">Top 10 clientes por ticket médio, entre os que compraram de 13 ou mais das 14 categorias do catálogo.</p>
+      <p class="scenario-quote reveal">A Diretoria quer mapear os clientes de elite para "replicar o comportamento em outros segmentos." <cite>— Marina Costa</cite></p>
     </div>
 
     <div class="split">
@@ -85,12 +109,18 @@
       <h3>Detalhe dos 10 clientes</h3>
       <div class="table-scroll"><table id="q4-table"></table></div>
     </div>
+
+    <div class="diagnosis-box reveal">
+      <h3>Ação recomendada</h3>
+      <p>Priorize esses 10 perfis na campanha da semana que vem — são quem mais gasta por compra e mais transita pelo catálogo inteiro. É o comportamento que a Diretoria quer replicar no resto da base.</p>
+    </div>
   </section>
 
   <section id="q5" class="viz-root">
     <div class="section-head">
       <h2>Vendas por dia da semana</h2>
       <p class="section-sub">Média incluindo os dias sem nenhuma venda registrada — não só os dias com pedido.</p>
+      <p class="scenario-quote reveal">Um estagiário achou Domingo o melhor dia (R$ 5.000 de média) — esqueceu dos domingos com venda zero. <cite>— cenário do Sr. Almir</cite></p>
     </div>
 
     <div class="chart-card reveal">
@@ -98,12 +128,18 @@
       <p class="chart-note" id="q5-caption"></p>
       <div class="chart-wrap"><canvas id="chart-q5-weekday"></canvas></div>
     </div>
+
+    <div class="diagnosis-box reveal">
+      <h3>Ação recomendada</h3>
+      <p>Evite concentrar o lançamento da campanha numa quinta-feira — é o dia historicamente mais fraco. Quarta-feira é o mais forte, e um bom candidato pra empurrar o pico de divulgação.</p>
+    </div>
   </section>
 
   <section id="q6" class="viz-root">
     <div class="section-head">
       <h2>Previsão de demanda</h2>
       <p class="section-sub">Baseline de média móvel de 3 meses, walk-forward. Treino até dez/2025, teste = 1º trimestre de 2026.</p>
+      <p class="scenario-quote reveal">Coletes salva-vidas esgotaram no verão passado, âncoras sobraram no galpão — "não dá mais pra confiar no feeling." <cite>— Sr. Almir e Gabriel Santos</cite></p>
     </div>
 
     <div class="tiles" id="q6-tiles"></div>
@@ -112,17 +148,56 @@
       <h3>Real vs. previsto (unidades / mês)</h3>
       <div class="chart-wrap"><canvas id="chart-q6-forecast"></canvas></div>
     </div>
+
+    <div class="diagnosis-box reveal">
+      <h3>Ação recomendada</h3>
+      <p>Reforce o estoque da Bússola de Bordo 702 antes do pico — a demanda sobe mais rápido do que uma média móvel simples consegue prever. O mesmo cuidado evita o problema dos coletes salva-vidas em qualquer produto da campanha.</p>
+    </div>
   </section>
 
   <section id="q7" class="viz-root">
     <div class="section-head">
       <h2>Recomendação</h2>
       <p class="section-sub">Top 5 produtos mais similares a "Motor de Popa 1949", com base em quais clientes compraram cada item.</p>
+      <p class="scenario-quote reveal">Clientes que compram lancha quase sempre esquecem a defensa — Marina quer uma vitrine de "quem comprou isso, também levou." <cite>— Marina Costa</cite></p>
     </div>
 
     <div class="chart-card reveal">
       <h3>Similaridade de cosseno</h3>
       <div class="chart-wrap"><canvas id="chart-q7-similares"></canvas></div>
+    </div>
+
+    <div class="diagnosis-box reveal">
+      <h3>Ação recomendada</h3>
+      <p>Use "Motor de Popa 5331" como sugestão automática de cross-sell pra quem compra "Motor de Popa 1949" na campanha — é a mesma lógica da defensa esquecida, aplicada ao catálogo real.</p>
+    </div>
+  </section>
+
+  <section id="sintese" class="viz-root closing">
+    <div class="section-head">
+      <h2>O que isso significa pro lançamento</h2>
+      <p class="section-sub">Nenhuma seção sozinha conta a história inteira — cruzando os achados, dois padrões ficam claros.</p>
+    </div>
+
+    <div class="split">
+      <div class="chart-card reveal">
+        <h3>Fidelidade → Recomendação</h3>
+        <p class="chart-note">Os clientes fiéis (seção 4) compram de quase todas as categorias do catálogo. O motor de recomendação (seção 7) é literalmente o mecanismo pra tentar replicar esse comportamento no resto da base — que é exatamente o que a Diretoria pediu.</p>
+      </div>
+      <div class="chart-card reveal">
+        <h3>Timing da campanha</h3>
+        <p class="chart-note">O melhor/pior dia da semana (seção 5) e a curva de demanda mensal (seção 6) juntos respondem "quando", não só "o quê" — quando divulgar e quando garantir estoque.</p>
+      </div>
+    </div>
+
+    <div class="table-card reveal">
+      <h3>Checklist antes do lançamento</h3>
+      <ul class="checklist">
+        <li><strong>Gabriel</strong> — schema no Postgres, pipeline documentado e reprodutível, nenhuma decisão de negócio escondida no código.</li>
+        <li><strong>Marina</strong> — os 10 clientes fiéis (Q4) e as recomendações de cross-sell (Q7) prontos pra priorizar a campanha.</li>
+        <li><strong>Sr. Almir</strong> — dados verificados (Q1), calendário correto (Q5) e previsão de demanda (Q6) provam que não é "feeling".</li>
+        <li><strong>Todos</strong> — evitar lançar/reforçar campanha numa quinta-feira e garantir estoque antes do pico de demanda.</li>
+      </ul>
     </div>
   </section>
 

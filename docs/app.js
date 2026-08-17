@@ -373,9 +373,15 @@ function hideWithin(root) {
   root.querySelectorAll(".reveal").forEach((el) => el.classList.remove("is-visible"));
 }
 
-/* monta os dados (tiles + Chart) uma única vez por seção */
+/* monta os dados (tiles + Chart) uma única vez por seção — seções sem
+   mounter (ex.: a síntese final, que é só conteúdo estático) só recebem
+   a animação de reveal, sem tentar buscar dado nenhum. */
 async function mountSection(section) {
   const id = section.id;
+  if (!MOUNTERS[id]) {
+    mountedSections.add(id);
+    return;
+  }
   try {
     const data = await dataPromises[id];
     const chart = MOUNTERS[id](data);
