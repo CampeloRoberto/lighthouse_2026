@@ -12,7 +12,6 @@ sql/                   SQL de cada questão (Q1, Q4, Q5) + schema gerado (Q2)
 src/                   scripts Python de cada questão (Q2, Q3, Q6, Q7) + helper db.py
 respostas/             respostas_desafio.md — validações e explicações de cada questão
 docs/                  dashboard web (HTML/CSS/JS + Chart.js), publicado via GitHub Pages
-dashboard/             guia de referência do Power BI (caminho secundário, não usado na entrega final)
 .venv/                 ambiente virtual Python do projeto
 ```
 

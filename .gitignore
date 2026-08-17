@@ -9,9 +9,8 @@ __pycache__/
 data/raw/*.csv
 !data/raw/.gitkeep
 
-# Power BI
-dashboard/*.pbix.bak
-~$*.pbix
+# Dashboard antigo do Power BI (abandonado — o dashboard final é docs/, via GitHub Pages)
+dashboard/
 
 # Scratch / arquivos temporários
 scratch_*.py
